@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         bgm.tv 自动深色模式相关修复
 // @namespace    https://github.com/DustRespirator
-// @version      0.1.2
+// @version      0.2
 // @description  处理用户手动使用“关灯/开灯”选项后无法响应浏览器自动切换深色模式的情况
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -13,12 +13,17 @@
 (function() {
     "use strict";
 
-    // Fix misplaced "|"
     const listItem = document.querySelector(".content > ul > li.last");
-    if (listItem) {
-        const replaceToggleThemeText = listItem.querySelector("#toggleTheme");
-        replaceToggleThemeText.textContent = "关灯";
+    if (!listItem) {
+        return;
     }
+    // Fix misplaced "|"
+    const toggle = listItem.querySelector("#toggleTheme");
+
+    function removeVerticalBar() {
+        toggle.textContent = toggle.textContent.replace(/\s*\|\s*$/, "");
+    }
+    removeVerticalBar();
 
     // Add checkbox for auto theme fix
     const checkboxLabel = document.createElement("label");
@@ -52,6 +57,7 @@
         } else {
             manualToggleTheme();
         }
+        removeVerticalBar();
     })
 
     document.querySelector("#toggleTheme").addEventListener("click", (e) => {
@@ -59,5 +65,6 @@
         if (checkbox) {
             checkbox.checked = false;
         }
+        removeVerticalBar();
     })
 })();
