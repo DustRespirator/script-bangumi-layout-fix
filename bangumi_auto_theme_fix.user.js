@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         bgm.tv 浅色深色模式相关修复
+// @name         bgm.tv 自动深色模式相关修复
 // @namespace    https://github.com/DustRespirator
-// @version      0.1
+// @version      0.1.1
 // @description  处理用户手动使用“关灯/开灯”选项后无法响应浏览器自动切换深色模式的情况
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -40,7 +40,7 @@
         chiiLib.ukagaka.autoTheme();
     }
 
-    // restore cookie "chii_theme_choose", refer to function updateTheme(style, remember) {}
+    // restore cookie "chii_theme_choose", refer to function updateTheme(style, remember), https://bgm.tv/min/g=js
     function manualToggleTheme() {
         const expires = new Date(Date.now() + 2592000 * 24 * 60 * 60 * 1000).toUTCString();
         document.cookie = "chii_theme_choose=1; expires=" + expires + "; path=/;";
