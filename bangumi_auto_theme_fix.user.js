@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         bgm.tv 自动深色模式相关修复
 // @namespace    https://github.com/DustRespirator
-// @version      0.2
+// @version      0.3
 // @description  处理用户手动使用“关灯/开灯”选项后无法响应浏览器自动切换深色模式的情况
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -19,7 +19,6 @@
     }
     // Fix misplaced "|"
     const toggle = listItem.querySelector("#toggleTheme");
-
     function removeVerticalBar() {
         toggle.textContent = toggle.textContent.replace(/\s*\|\s*$/, "");
     }
@@ -51,6 +50,7 @@
         document.cookie = "chii_theme_choose=1; expires=" + expires + "; path=/;";
     }
 
+    // Listener for status change of checkbox
     document.querySelector("#autoToggleThemeCheckbox").addEventListener("change", (e) => {
         if (e.target.checked) {
             autoToggleTheme();
@@ -60,11 +60,27 @@
         removeVerticalBar();
     })
 
+    // Listener for clicking the toggle
     document.querySelector("#toggleTheme").addEventListener("click", (e) => {
         const checkbox = document.querySelector("#autoToggleThemeCheckbox");
         if (checkbox) {
             checkbox.checked = false;
         }
-        removeVerticalBar();
+        //removeVerticalBar();
     })
+
+    // Observer to cover the id="toggleTheme" text change
+    const observer = new MutationObserver(() => {
+        const current = toggle.textContent;
+        const trimmed = current.replace(/\s*\|\s*$/, "");
+        if (current !== trimmed) {
+            toggle.textContent = trimmed;
+        }
+    });
+
+    observer.observe(toggle, {
+        characterData: true,
+        childList: true,
+        subtree: false
+    });
 })();
