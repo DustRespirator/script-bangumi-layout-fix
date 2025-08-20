@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         bgm.tv BBCODE工具栏微调
+// @name         bgm.tv BBCode工具栏微调
 // @namespace    https://github.com/DustRespirator
 // @version      0.1
 // @description  根据个人喜好微调了工具栏图标位置和间距
