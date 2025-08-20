@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         bgm.tv 自动深色模式相关修复
 // @namespace    https://github.com/DustRespirator
-// @version      0.3
+// @version      0.4
 // @description  处理用户手动使用“关灯/开灯”选项后无法响应浏览器自动切换深色模式的情况
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -17,6 +17,8 @@
     if (!listItem) {
         return;
     }
+    listItem.style.display = "inline-flex";
+    listItem.style.alignItems = "center";
     // Fix misplaced "|"
     const toggle = listItem.querySelector("#toggleTheme");
     function removeVerticalBar() {
@@ -27,6 +29,8 @@
     // Add checkbox for auto theme fix
     const checkboxLabel = document.createElement("label");
     checkboxLabel.style.cursor = "pointer";
+    checkboxLabel.style.display = "inline-flex";
+    checkboxLabel.style.alignItems = "center";
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.id = "autoToggleThemeCheckbox";
@@ -36,7 +40,15 @@
     checkboxLabel.appendChild(checkbox);
     checkboxLabel.append(" 自动深色模式");
 
-    listItem.append(" | ", checkboxLabel, " |");
+    // Make a separator with padding 4px on the left and right
+    function makeSeparator() {
+        const span = document.createElement("span");
+        span.textContent = "|";
+        span.style.padding = "0 4px";
+        return span;
+    }
+
+    listItem.append(makeSeparator(), checkboxLabel, makeSeparator());
 
     // Remove cookie "chii_theme_choose", enable auto theme
     function autoToggleTheme() {
