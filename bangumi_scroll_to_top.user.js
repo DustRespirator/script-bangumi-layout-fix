@@ -16,7 +16,7 @@
     // For touch, pull at bottom of page: return to top
     const BOTTOM_PULL_THRESHOLD = window.innerHeight * 0.4;
     const COOLDOWN = 1000;
-    const SCREEN_WIDTH = window.innerWidth;
+    //const SCREEN_WIDTH = window.innerWidth;
     const root = document.scrollingElement || document.documentElement;
 
     const indicator = document.createElement("div");
@@ -67,9 +67,9 @@
 
         tracking = true;
         startedAtBottom = atBottom();
+        pulledHeight = 0;
         //lastX = e.touches[0].clientX;
         lastY = e.touches[0].clientY;
-        pulledHeight = 0;
         updateIndicatorColor("taikoh");
     }, { passive: true });
 
@@ -98,13 +98,23 @@
         }
     }, { passive: false });
 
+    document.addEventListener("touchcancel", () => {
+        indicator.style.opacity = "0";
+        needsUpdate = false;
+        tracking = false;
+        startedAtBottom = false;
+        pulledHeight = 0;
+    }, { passive: true });
+
     document.addEventListener("touchend", (e) => {
         if (pulledHeight >= BOTTOM_PULL_THRESHOLD && (Date.now() - lastTriggerTime) > COOLDOWN) {
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
             updateIndicatorColor("kohbai");
-            indicator.style.opacity = "0";
+            setTimeout(() => {
+                indicator.style.opacity = "0";
+            }, 100);
             setTimeout(() => {
                 window.scrollTo({ top: 0, behavior: "auto" });
             }, 300);
@@ -116,6 +126,7 @@
         } else {
             indicator.style.opacity = "0";
         }
+        needsUpdate = false;
         tracking = false;
         startedAtBottom = false;
         pulledHeight = 0;
