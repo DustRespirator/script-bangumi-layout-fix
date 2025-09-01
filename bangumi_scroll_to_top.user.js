@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         快速返回页面顶部
 // @namespace    https://github.com/DustRespirator
-// @version      0.1
+// @version      0.2
 // @description  仅适用于触摸操作，在页面底部向上滑动可回到页首
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -14,7 +14,7 @@
     "use strict";
 
     // For touch, pull at bottom of page: return to top
-    const BOTTOM_PULL_THRESHOLD = window.innerHeight * 0.4; //
+    const BOTTOM_PULL_THRESHOLD = window.innerHeight * 0.4;
     const COOLDOWN = 1000;
     const SCREEN_WIDTH = window.innerWidth;
     const root = document.scrollingElement || document.documentElement;
@@ -53,7 +53,7 @@
 
     function updateIndicator() {
         if (needsUpdate) {
-            indicator.style.opacity = Math.min(pulledHeight / BOTTOM_PULL_THRESHOLD, 1);
+            indicator.style.opacity = Math.min(pulledHeight / BOTTOM_PULL_THRESHOLD, 1) + "";
             needsUpdate = false;
         }
         requestAnimationFrame(updateIndicator);
@@ -85,13 +85,18 @@
         //lastX = e.touches[0].clientX;
 
         pulledHeight += (-dy);
+        if (dy >= 0 && indicator.style.opacity !== "0") {
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+        }
         updateIndicator();
         if (pulledHeight >= BOTTOM_PULL_THRESHOLD) {
             updateIndicatorColor("momo");
         } else {
             updateIndicatorColor("taikoh");
         }
-    }, { passive: true });
+    }, { passive: false });
 
     document.addEventListener("touchend", (e) => {
         if (pulledHeight >= BOTTOM_PULL_THRESHOLD && (Date.now() - lastTriggerTime) > COOLDOWN) {
@@ -99,19 +104,17 @@
             e.stopPropagation();
             e.stopImmediatePropagation();
             updateIndicatorColor("kohbai");
-            setTimeout(() => {
-                indicator.style.opacity = 0;
-            }, 100);
+            indicator.style.opacity = "0";
             setTimeout(() => {
                 window.scrollTo({ top: 0, behavior: "auto" });
             }, 300);
             lastTriggerTime = Date.now();
-            document.body.classList.add('no-scroll');
+            document.body.classList.add("no-scroll");
             setTimeout(() => {
-                document.body.classList.remove('no-scroll');
-            }, 25);
+                document.body.classList.remove("no-scroll");
+            }, 50);
         } else {
-            indicator.style.opacity = 0;
+            indicator.style.opacity = "0";
         }
         tracking = false;
         startedAtBottom = false;
