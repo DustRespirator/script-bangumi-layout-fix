@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         快速返回页面顶部
 // @namespace    https://github.com/DustRespirator
-// @version      0.2
+// @version      0.3
 // @description  仅适用于触摸操作，在页面底部向上滑动可回到页首
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -19,9 +19,45 @@
     //const SCREEN_WIDTH = window.innerWidth;
     const root = document.scrollingElement || document.documentElement;
 
+    const themeColors = {
+        pink: {
+            normal:  "248,195,205", // taikoh
+            ready:   "245,150,170", // momo
+            trigger: "225,107,140"  // kohbai
+        },
+        blue: {
+            normal:  "58,143,183",  // chigusa
+            ready:   "0,160,233",   // ao
+            trigger: "0,134,204"    // ama
+        },
+        green: {
+            normal:  "134,193,102", // nae
+            ready:   "144,180,75",  // hiwamoegi
+            trigger: "123,162,63"   // moegi
+        },
+        purple: {
+            normal:  "178,143,206", // usu
+            ready:   "152,109,178", // hashita
+            trigger: "119,66,141"   // edomurasaki
+        },
+        orange: {
+            normal:  "237,120,74",  // sohi
+            ready:   "247,92,47",   // benihi
+            trigger: "240,94,28"    // ohni
+        },
+        red: {
+            normal:  "215,84,85",   // entan
+            ready:   "203,64,66",   // akabeni
+            trigger: "199,62,58"    // ginsyu
+        },
+        
+    }
+
     const indicator = document.createElement("div");
     indicator.id = "pull-indicator";
     document.body.appendChild(indicator);
+
+    let currentThemeColor = getThemeColor();
 
     let needsUpdate = false;
     let tracking = false;
@@ -35,16 +71,17 @@
         return Math.abs(root.scrollHeight - root.clientHeight - root.scrollTop) <= 100;
     }
 
-    function updateIndicatorColor(color) {
-        switch (color) {
-            case "taikoh":
-                indicator.style.setProperty("--indicator-color", "248,195,205");
+    function updateIndicatorColor(state) {
+        const theme = themeColors[currentThemeColor] || themeColors.pink;
+        switch (state) {
+            case "normal":
+                indicator.style.setProperty("--indicator-color", theme.normal);
                 break;
-            case "momo":
-                indicator.style.setProperty("--indicator-color", "245,150,170");
+            case "ready":
+                indicator.style.setProperty("--indicator-color", theme.ready);
                 break;
-            case "kohbai":
-                indicator.style.setProperty("--indicator-color", "225,107,140");
+            case "trigger":
+                indicator.style.setProperty("--indicator-color", theme.trigger);
                 break;
             default:
                 break;
@@ -70,7 +107,7 @@
         pulledHeight = 0;
         //lastX = e.touches[0].clientX;
         lastY = e.touches[0].clientY;
-        updateIndicatorColor("taikoh");
+        updateIndicatorColor("normal");
     }, { passive: true });
 
     document.addEventListener("touchmove", (e) => {
@@ -92,9 +129,9 @@
         }
         updateIndicator();
         if (pulledHeight >= BOTTOM_PULL_THRESHOLD) {
-            updateIndicatorColor("momo");
+            updateIndicatorColor("ready");
         } else {
-            updateIndicatorColor("taikoh");
+            updateIndicatorColor("normal");
         }
     }, { passive: false });
 
@@ -111,7 +148,7 @@
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-            updateIndicatorColor("kohbai");
+            updateIndicatorColor("trigger");
             setTimeout(() => {
                 indicator.style.opacity = "0";
             }, 100);
@@ -131,4 +168,22 @@
         startedAtBottom = false;
         pulledHeight = 0;
     }, { passive: false });
+
+    // Get theme color config
+    function getThemeColor() {
+        return document.documentElement.getAttribute("data-theme-color") || "pink";
+    }
+
+    // Observer to get theme color config
+    const observer = new MutationObserver(() => {
+        const newThemeColor = getThemeColor()
+        if (currentThemeColor !== newThemeColor) {
+            currentThemeColor = newThemeColor;
+        }
+    });
+
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ["data-theme-color"]
+    });
 })();
