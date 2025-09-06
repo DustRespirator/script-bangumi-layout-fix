@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         bgm.tv 自动深色模式相关修复
+// @name         bgm.tv 自动深色模式相关修复 (deprecated)
 // @namespace    https://github.com/DustRespirator
 // @version      0.4
 // @description  处理用户手动使用“关灯/开灯”选项后无法响应浏览器自动切换深色模式的情况
