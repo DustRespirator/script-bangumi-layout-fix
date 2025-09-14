@@ -132,7 +132,7 @@
     // Slide bar touch fix
     //========================================================
     (function() {
-        const isEnabled = document.cookie.includes("enable_touch_slider=1");
+        const isEnabled = document.cookie.includes("enable_touch_slider=on");
         const hasSliderBar = document.getElementById("sliderContainer");
         if (!isEnabled || !hasSliderBar) {
             return;
