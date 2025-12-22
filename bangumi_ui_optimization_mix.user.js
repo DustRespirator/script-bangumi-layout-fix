@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         bgm.tv 自用 UI 优化聚合
 // @namespace    https://github.com/DustRespirator
-// @version      0.5
+// @version      0.5.1
 // @description  参见注释
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -259,19 +259,16 @@
     // Make customize icon toggle panel display/hidden
     //========================================================
     (function() {
-        const hasCustomizeToggle = document.querySelector(".toggle-customize");
-        if (!hasCustomizeToggle) {
-            return;
-        }
 
-        // Initialize customize panel manually
-        chiiLib.ukagaka.initCustomizePanel();
         const _originalShowCP = chiiLib.ukagaka.showCustomizePanel.bind(chiiLib.ukagaka);
+        let isHidden = true;
 
         // Override showCustomizePanel()
         chiiLib.ukagaka.showCustomizePanel = function() {
-            const customizePanel = document.getElementById("customize-panel");
-            const isHidden = (window.getComputedStyle(customizePanel).display === "none");
+            const customizePanel = document.getElementById("customize-panel") || null;
+            if (customizePanel) {
+                isHidden = (window.getComputedStyle(customizePanel).display === "none")
+            }
             //console.log("isHidden: ", isHidden);
             if (customizePanel && !isHidden && document.documentElement.getAttribute("enable_toggle_cp") === "on") {
                 customizePanel.style.display = "none";
