@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         bgm.tv 自用 UI 优化聚合
 // @namespace    https://github.com/DustRespirator
-// @version      0.4.1
+// @version      0.5
 // @description  参见注释
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -14,7 +14,7 @@
     "use strict";
 
     // Cookie name of features
-    const features = ["enable_touch_slider", "enable_popup_keyboard", "enable_toggle_cp"];
+    const features = ["enable_touch_slider", "enable_tooltip_filler", "enable_popup_keyboard", "enable_toggle_cp"];
     // Initialize html attributes
     const html = document.documentElement;
     features.forEach((name) => {
@@ -43,6 +43,32 @@
                         customizeConfigOn("enable_touch_slider");
                     } else {
                         customizeConfigOff("enable_touch_slider");
+                    }
+                },
+                options: [
+                    {
+                        value: "off",
+                        label: "关闭"
+                    },
+                    {
+                        value: "on",
+                        label: "开启"
+                    }
+                ]
+            },
+            {
+                title: "改善贴贴用户列表难以用鼠标点击的问题（刷新后生效）",
+                name: "enableTooltipFiller",
+                type: "radio",
+                defaultValue: "off",
+                getCurrentValue: function() {
+                    return getValueFromCookie("enable_tooltip_filler");
+                },
+                onChange: function(value) {
+                    if (value === "on") {
+                        customizeConfigOn("enable_tooltip_filler");
+                    } else {
+                        customizeConfigOff("enable_tooltip_filler");
                     }
                 },
                 options: [
@@ -167,6 +193,34 @@
                 }
             }, 300);
         };
+    })();
+
+    //========================================================
+    // Fix the tooltip on likes grid is hard to touch
+    //========================================================
+    (function() {
+        const isEnabled = document.cookie.includes("enable_tooltip_filler=on");
+        if (!isEnabled) {
+            return;
+        }
+
+        (function insertFiller(heightPx = 4) {
+            const style = document.createElement("style");
+            style.textContent = `
+                .tooltip.fade.in.top::after {
+                    content: "";
+                    position: absolute;
+                    top: 100%;
+                    left: 0;
+                    width: 100%;
+                    height: ${heightPx}px;
+                    z-index: 1020;
+                    pointer-events: auto;
+                    display: block;
+                }
+            `;
+            document.head.appendChild(style);
+        })();
     })();
 
     //========================================================
