@@ -259,7 +259,6 @@
     // Make customize icon toggle panel display/hidden
     //========================================================
     (function() {
-
         const _originalShowCP = chiiLib.ukagaka.showCustomizePanel.bind(chiiLib.ukagaka);
         let isHidden = true;
 
@@ -269,7 +268,6 @@
             if (customizePanel) {
                 isHidden = (window.getComputedStyle(customizePanel).display === "none")
             }
-            //console.log("isHidden: ", isHidden);
             if (customizePanel && !isHidden && document.documentElement.getAttribute("enable_toggle_cp") === "on") {
                 customizePanel.style.display = "none";
             } else {
