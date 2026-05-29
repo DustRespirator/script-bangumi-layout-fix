@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         bgm.tv 自用 UI 优化聚合
 // @namespace    https://github.com/DustRespirator
-// @version      0.5.1
+// @version      0.5.2
 // @description  参见注释
 // @author       Hoi
 // @match        https://bgm.tv/*
@@ -23,6 +23,46 @@
             html.setAttribute(name, "on");
         }
     });
+
+    // Cloud sync, copy and paste from app_4736, source: bgm.tv/group/topic/435662
+    let configs = {};
+
+    function getFeatureSnapshot() {
+        return features.reduce((result, name) => ({
+            ...result,
+            [name]: getValueFromCookie(name)
+        }), {});
+    }
+
+    function isDictDifferent(dict1, dict2) {
+        return JSON.stringify(Object.entries(dict1).sort()) !==
+               JSON.stringify(Object.entries(dict2).sort());
+    }
+
+    function applyCloudSettings() {
+        const cloudSettings = chiiApp.cloud_settings.getAll();
+        features.forEach((name) => {
+            const cloudValue = cloudSettings[name];
+            if (cloudValue === "on") {
+                customizeConfigOn(name);
+            } else if (cloudValue === "off") {
+                customizeConfigOff(name);
+            }
+        });
+    }
+
+    chiiLib.ukagaka.onOpen(() => {
+        configs = getFeatureSnapshot();
+    });
+
+    chiiLib.ukagaka.onClose(() => {
+        const newConfigs = getFeatureSnapshot();
+        if (isDictDifferent(configs, newConfigs)) {
+            chiiApp.cloud_settings.update(newConfigs);
+        }
+    });
+
+    applyCloudSettings();
 
     // Add Panel Tab
     chiiLib.ukagaka.addPanelTab({
@@ -260,16 +300,15 @@
     //========================================================
     (function() {
         const _originalShowCP = chiiLib.ukagaka.showCustomizePanel.bind(chiiLib.ukagaka);
-        let isHidden = true;
 
         // Override showCustomizePanel()
         chiiLib.ukagaka.showCustomizePanel = function() {
             const customizePanel = document.getElementById("customize-panel") || null;
-            if (customizePanel) {
-                isHidden = (window.getComputedStyle(customizePanel).display === "none")
-            }
-            if (customizePanel && !isHidden && document.documentElement.getAttribute("enable_toggle_cp") === "on") {
-                customizePanel.style.display = "none";
+            if (customizePanel && window.getComputedStyle(customizePanel).display !== "none" && document.documentElement.getAttribute("enable_toggle_cp") === "on") {
+                const closeButton = document.getElementById("close-panel-btn");
+                if (closeButton) {
+                    closeButton.click();
+                }
             } else {
                 _originalShowCP();
             }
